@@ -1,4 +1,6 @@
 'use client';
+export const dynamic = 'force-dynamic';
+
 import PostBody from '@/components/Blog/PostBody';
 import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
 
