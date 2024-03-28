@@ -75,7 +75,9 @@
     @apply font-primary text-sm md:text-base;
   }
   /* #endregion  /**======== Typography =========== */
-
+  html {
+    scroll-behavior: smooth;
+  }
   .layout {
     /* 1100px */
     max-width: 68.75rem;
@@ -114,5 +116,19 @@
   .animated-underline:hover,
   .animated-underline:focus-visible {
     background-size: 0 2px, 100% 2px;
+  }
+}
+
+/* Define the animation */
+
+.headerAnimation {
+  animation: fadeIn 0.4s ease-in-out;
+}
+@keyframes fadeIn {
+  0% {
+    transform: translateY(-200px);
+  }
+  100% {
+    transform: translateY(0);
   }
 }

@@ -1,15 +1,18 @@
 'use client';
 
+import About from '@/components/About/About';
+import Blog from '@/components/Blog/Blog';
+import Contact from '@/components/Contact/Contact';
+import Experience from '@/components/Experience/Experience';
+import Footer from '@/components/Footer/Footer';
+import Header from '@/components/Header/Header';
+import Hero from '@/components/Hero/Hero';
+import Skills from '@/components/Skills/Skills';
+import { Params } from '@fortawesome/fontawesome-svg-core';
 import Head from 'next/head';
 import * as React from 'react';
-
-import ArrowLink from '@/components/links/ArrowLink';
-import ButtonLink from '@/components/links/ButtonLink';
-import UnderlineLink from '@/components/links/UnderlineLink';
-import UnstyledLink from '@/components/links/UnstyledLink';
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faTrash } from '@fortawesome/free-solid-svg-icons';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 /**
  * SVGR Support
@@ -25,42 +28,107 @@ import Logo from '~/svg/Logo.svg';
 // to customize the default configuration.
 
 export default function HomePage() {
+  const [darkMode, setMode] = React.useState<boolean>(true);
+  const [activeTab, setActiveTab] = React.useState<string>('About');
+  const [headerActive, setHeader] = React.useState<boolean>(true);
+
+  const [allPost, setPost] = React.useState<
+    [
+      {
+        coverImage: string;
+        slug: string;
+        title: string;
+        date: string;
+        excerpt: string;
+        author: { picture: string; name: string };
+      }
+    ]
+  >();
+
+  const Post = async () => {
+    try {
+      const res = await fetch(`/api/allPosts`, {
+        method: 'GET',
+        headers: {
+          'content-type': 'application/json',
+        },
+      });
+
+      const result = await res.json();
+      setPost(result.post);
+    } catch (err) {
+      return;
+    }
+  };
+
+  React.useEffect(() => {
+    Post();
+    AOS.init({
+      once: true,
+      offset: 100,
+      duration: 1000,
+      anchorPlacement: 'top-top',
+    });
+  }, []);
+
+  const [showHeader, setShowHeader] = React.useState(true);
+  const [position, setPosition] = React.useState<number>(0);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setPosition(scrollPosition);
+      if (scrollPosition > 300) {
+        setShowHeader(false);
+      } else {
+        setShowHeader(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   return (
     <main>
       <Head>
         <title>Hi</title>
       </Head>
-      <section className='bg-white'>
-        <div className='layout relative flex min-h-screen flex-col items-center justify-center py-12 text-center'>
-          <Logo className='w-16' />
-          <h1 className='mt-4'>Next.js + Tailwind CSS + TypeScript Starter</h1>
-          <p className='mt-2 text-sm text-gray-800'>
-            A starter for Next.js, Tailwind CSS, and TypeScript with Absolute
-            Import, Seo, Link component, pre-configured with Husky{' '}
-          </p>
-          <p className='mt-2 text-sm text-gray-700'>
-            <ArrowLink href=''>See the repository</ArrowLink>
-          </p>
-
-          <ButtonLink className='mt-6' href='/components' variant='light'>
-            See all components
-          </ButtonLink>
-
-          <UnstyledLink href='' className='mt-4'>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img width='92' height='32' src='' alt='Deploy with Vercel' />
-          </UnstyledLink>
-
-          <FontAwesomeIcon
-            icon={faCheck}
-            className='fas fa-check text-green-700'
+      <section
+        className={`${darkMode ? 'fuchsia bg-black ' : 'teal bg-white '} `}
+      >
+        <Header
+          params=''
+          setMode={setMode}
+          mode={darkMode}
+          setActiveTab={setActiveTab}
+          activeTab={activeTab}
+          headerActive={showHeader}
+        />
+        <Hero
+          setActiveTab={setActiveTab}
+          activeTab={activeTab}
+          setHeader={setHeader}
+          headerActive={headerActive}
+        />
+        <About
+          setActiveTab={setActiveTab}
+          activeTab={activeTab}
+          setHeader={setHeader}
+        />
+        <Experience setActiveTab={setActiveTab} activeTab={activeTab} />
+        <Skills setActiveTab={setActiveTab} activeTab={activeTab} />
+        {allPost && (
+          <Blog
+            morePost={allPost}
+            setActiveTab={setActiveTab}
+            activeTab={activeTab}
           />
-
-          <footer className='absolute bottom-2 text-gray-700'>
-            © {new Date().getFullYear()} By{' '}
-            <UnderlineLink href=''>Theodorus Clarence</UnderlineLink>
-          </footer>
-        </div>
+        )}
+        <Contact setActiveTab={setActiveTab} activeTab={activeTab} />
+        <Footer />
       </section>
     </main>
   );
